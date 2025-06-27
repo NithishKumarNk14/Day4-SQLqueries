@@ -1,0 +1,388 @@
+Enter password: **************
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 17
+Server version: 9.3.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> -- 1. Create a new database
+Query OK, 0 rows affected (0.007 sec)
+
+mysql> CREATE DATABASE ecommerce;
+Query OK, 1 row affected (0.414 sec)
+
+mysql>
+mysql> -- 2. Switch to using the database
+Query OK, 0 rows affected (0.004 sec)
+
+mysql> USE ecommerce;
+Database changed
+mysql>
+mysql> -- Now you can create tables, insert data, etc.
+Query OK, 0 rows affected (0.003 sec)
+
+mysql> -- Drop tables if they exist (optional, helps reset)
+Query OK, 0 rows affected (0.006 sec)
+
+mysql> DROP TABLE IF EXISTS order_items;
+Query OK, 0 rows affected, 1 warning (0.112 sec)
+
+mysql> DROP TABLE IF EXISTS orders;
+Query OK, 0 rows affected, 1 warning (0.035 sec)
+
+mysql> DROP TABLE IF EXISTS products;
+Query OK, 0 rows affected, 1 warning (0.036 sec)
+
+mysql> DROP TABLE IF EXISTS customers;
+Query OK, 0 rows affected, 1 warning (0.037 sec)
+
+mysql>
+mysql> -- Create customers table
+Query OK, 0 rows affected (0.006 sec)
+
+mysql> CREATE TABLE customers (
+    ->   customer_id INT PRIMARY KEY,
+    ->   name VARCHAR(50),
+    ->   email VARCHAR(100),
+    ->   country VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.329 sec)
+
+mysql>
+mysql> -- Insert data into customers
+Query OK, 0 rows affected (0.006 sec)
+
+mysql> INSERT INTO customers (customer_id, name, email, country) VALUES
+    -> (1, 'Alice', 'alice@email.com', 'USA'),
+    -> (2, 'Bob', 'bob@email.com', 'Canada'),
+    -> (3, 'Charlie', 'charlie@email.com', 'India');
+Query OK, 3 rows affected (0.071 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- Create products table
+Query OK, 0 rows affected (0.006 sec)
+
+mysql> CREATE TABLE products (
+    ->   product_id INT PRIMARY KEY,
+    ->   product_name VARCHAR(100),
+    ->   category VARCHAR(50),
+    ->   price DECIMAL(10, 2)
+    -> );
+Query OK, 0 rows affected (0.264 sec)
+
+mysql>
+mysql> -- Insert data into products
+Query OK, 0 rows affected (0.004 sec)
+
+mysql> INSERT INTO products (product_id, product_name, category, price) VALUES
+    -> (101, 'Laptop', 'Electronics', 800.00),
+    -> (102, 'Smartphone', 'Electronics', 500.00),
+    -> (103, 'Book', 'Stationery', 30.00),
+    -> (104, 'Headphones', 'Accessories', 100.00);
+Query OK, 4 rows affected (0.107 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- Create orders table
+Query OK, 0 rows affected (0.005 sec)
+
+mysql> CREATE TABLE orders (
+    ->   order_id INT PRIMARY KEY,
+    ->   customer_id INT,
+    ->   order_date DATE,
+    ->   total_amount DECIMAL(10, 2),
+    ->   FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+    -> );
+Query OK, 0 rows affected (0.571 sec)
+
+mysql>
+mysql> -- Insert data into orders
+Query OK, 0 rows affected (0.005 sec)
+
+mysql> INSERT INTO orders (order_id, customer_id, order_date, total_amount) VALUES
+    -> (1001, 1, '2024-06-01', 1300.00),
+    -> (1002, 2, '2024-06-02', 500.00),
+    -> (1003, 3, '2024-06-03', 30.00),
+    -> (1004, 1, '2024-06-04', 100.00);
+Query OK, 4 rows affected (0.054 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- Create order_items table
+Query OK, 0 rows affected (0.003 sec)
+
+mysql> CREATE TABLE order_items (
+    ->   item_id INT PRIMARY KEY,
+    ->   order_id INT,
+    ->   product_id INT,
+    ->   quantity INT,
+    ->   price DECIMAL(10, 2),
+    ->   FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    ->   FOREIGN KEY (product_id) REFERENCES products(product_id)
+    -> );
+Query OK, 0 rows affected (0.665 sec)
+
+mysql>
+mysql> -- Insert data into order_items
+Query OK, 0 rows affected (0.011 sec)
+
+mysql> INSERT INTO order_items (item_id, order_id, product_id, quantity, price) VALUES
+    -> (1, 1001, 101, 1, 800.00),
+    -> (2, 1001, 102, 1, 500.00),
+    -> (3, 1002, 102, 1, 500.00),
+    -> (4, 1003, 103, 1, 30.00),
+    -> (5, 1004, 104, 1, 100.00);
+Query OK, 5 rows affected (0.053 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> SHOW TABLES;
++---------------------+
+| Tables_in_ecommerce |
++---------------------+
+| customers           |
+| order_items         |
+| orders              |
+| products            |
++---------------------+
+4 rows in set (0.434 sec)
+
+mysql>
+mysql>
+mysql> -- a. Get all customers from India
+Query OK, 0 rows affected (0.011 sec)
+
+mysql> SELECT * FROM customers
+    -> WHERE country = 'India';
++-------------+---------+-------------------+---------+
+| customer_id | name    | email             | country |
++-------------+---------+-------------------+---------+
+|           3 | Charlie | charlie@email.com | India   |
++-------------+---------+-------------------+---------+
+1 row in set (0.271 sec)
+
+mysql>
+mysql> -- b. List all products under Electronics category
+Query OK, 0 rows affected (0.006 sec)
+
+mysql> SELECT * FROM products
+    -> WHERE category = 'Electronics';
++------------+--------------+-------------+--------+
+| product_id | product_name | category    | price  |
++------------+--------------+-------------+--------+
+|        101 | Laptop       | Electronics | 800.00 |
+|        102 | Smartphone   | Electronics | 500.00 |
++------------+--------------+-------------+--------+
+2 rows in set (0.033 sec)
+
+mysql>
+mysql> -- c. Get all orders placed after June 1, 2024
+Query OK, 0 rows affected (0.006 sec)
+
+mysql> SELECT * FROM orders
+    -> WHERE order_date > '2024-06-01'
+    -> ORDER BY order_date ASC;
++----------+-------------+------------+--------------+
+| order_id | customer_id | order_date | total_amount |
++----------+-------------+------------+--------------+
+|     1002 |           2 | 2024-06-02 |       500.00 |
+|     1003 |           3 | 2024-06-03 |        30.00 |
+|     1004 |           1 | 2024-06-04 |       100.00 |
++----------+-------------+------------+--------------+
+3 rows in set (0.037 sec)
+
+mysql>
+mysql>
+mysql>
+mysql> -- a. Show orders with customer names
+Query OK, 0 rows affected (0.015 sec)
+
+mysql> SELECT o.order_id, c.name, o.order_date, o.total_amount
+    -> FROM orders o
+    -> INNER JOIN customers c ON o.customer_id = c.customer_id;
++----------+---------+------------+--------------+
+| order_id | name    | order_date | total_amount |
++----------+---------+------------+--------------+
+|     1001 | Alice   | 2024-06-01 |      1300.00 |
+|     1004 | Alice   | 2024-06-04 |       100.00 |
+|     1002 | Bob     | 2024-06-02 |       500.00 |
+|     1003 | Charlie | 2024-06-03 |        30.00 |
++----------+---------+------------+--------------+
+4 rows in set (0.013 sec)
+
+mysql>
+mysql> -- b. Show order items with product names and customer names
+Query OK, 0 rows affected (0.005 sec)
+
+mysql> SELECT oi.item_id, c.name AS customer_name, p.product_name, oi.quantity, oi.price
+    -> FROM order_items oi
+    -> JOIN orders o ON oi.order_id = o.order_id
+    -> JOIN customers c ON o.customer_id = c.customer_id
+    -> JOIN products p ON oi.product_id = p.product_id;
++---------+---------------+--------------+----------+--------+
+| item_id | customer_name | product_name | quantity | price  |
++---------+---------------+--------------+----------+--------+
+|       1 | Alice         | Laptop       |        1 | 800.00 |
+|       2 | Alice         | Smartphone   |        1 | 500.00 |
+|       5 | Alice         | Headphones   |        1 | 100.00 |
+|       3 | Bob           | Smartphone   |        1 | 500.00 |
+|       4 | Charlie       | Book         |        1 |  30.00 |
++---------+---------------+--------------+----------+--------+
+5 rows in set (0.010 sec)
+
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql> -- a. List customers who spent more than 500 total
+Query OK, 0 rows affected (0.008 sec)
+
+mysql> SELECT * FROM customers
+    -> WHERE customer_id IN (
+    ->   SELECT customer_id
+    ->   FROM orders
+    ->   GROUP BY customer_id
+    ->   HAVING SUM(total_amount) > 500
+    -> );
++-------------+-------+-----------------+---------+
+| customer_id | name  | email           | country |
++-------------+-------+-----------------+---------+
+|           1 | Alice | alice@email.com | USA     |
++-------------+-------+-----------------+---------+
+1 row in set (0.277 sec)
+
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql> -- a. Total revenue
+Query OK, 0 rows affected (0.007 sec)
+
+mysql> SELECT SUM(total_amount) AS total_revenue
+    -> FROM orders;
++---------------+
+| total_revenue |
++---------------+
+|       1930.00 |
++---------------+
+1 row in set (0.257 sec)
+
+mysql>
+mysql> -- b. Average order value
+Query OK, 0 rows affected (0.004 sec)
+
+mysql> SELECT AVG(total_amount) AS avg_order_value
+    -> FROM orders;
++-----------------+
+| avg_order_value |
++-----------------+
+|      482.500000 |
++-----------------+
+1 row in set (0.013 sec)
+
+mysql>
+mysql> -- c. Revenue by category
+Query OK, 0 rows affected (0.007 sec)
+
+mysql> SELECT p.category, SUM(oi.quantity * oi.price) AS revenue
+    -> FROM order_items oi
+    -> JOIN products p ON oi.product_id = p.product_id
+    -> GROUP BY p.category;
++-------------+---------+
+| category    | revenue |
++-------------+---------+
+| Electronics | 1800.00 |
+| Stationery  |   30.00 |
+| Accessories |  100.00 |
++-------------+---------+
+3 rows in set (0.019 sec)
+
+mysql>
+mysql>
+mysql>
+mysql> -- Create a view showing customer and their total spend
+Query OK, 0 rows affected (0.008 sec)
+
+mysql> CREATE VIEW customer_spending AS
+    -> SELECT c.customer_id, c.name, SUM(o.total_amount) AS total_spent
+    -> FROM customers c
+    -> JOIN orders o ON c.customer_id = o.customer_id
+    -> GROUP BY c.customer_id, c.name;
+Query OK, 0 rows affected (0.326 sec)
+
+mysql>
+mysql> -- Query the view
+Query OK, 0 rows affected (0.005 sec)
+
+mysql> SELECT * FROM customer_spending;
++-------------+---------+-------------+
+| customer_id | name    | total_spent |
++-------------+---------+-------------+
+|           1 | Alice   |     1400.00 |
+|           2 | Bob     |      500.00 |
+|           3 | Charlie |       30.00 |
++-------------+---------+-------------+
+3 rows in set (0.034 sec)
+
+mysql> CREATE INDEX idx_orders_customer_id ON orders(customer_id);
+Query OK, 0 rows affected (0.668 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> CREATE INDEX idx_order_items_order_id ON order_items(order_id);
+Query OK, 0 rows affected (0.520 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> CREATE INDEX idx_order_items_product_id ON order_items(product_id);
+Query OK, 0 rows affected (0.528 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SHOW INDEXES FROM orders;
++--------+------------+------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table  | Non_unique | Key_name               | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++--------+------------+------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| orders |          0 | PRIMARY                |            1 | order_id    | A         |           4 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_customer_id |            1 | customer_id | A         |           3 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
++--------+------------+------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+2 rows in set (0.182 sec)
+
+mysql> SHOW INDEXES FROM order_items;
++-------------+------------+----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table       | Non_unique | Key_name                   | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++-------------+------------+----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| order_items |          0 | PRIMARY                    |            1 | item_id     | A         |           5 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| order_items |          1 | idx_order_items_order_id   |            1 | order_id    | A         |           4 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
+| order_items |          1 | idx_order_items_product_id |            1 | product_id  | A         |           4 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
++-------------+------------+----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+3 rows in set (0.113 sec)
+
+mysql> nano queries.sql
+    -> echo "SELECT * FROM customers;" >> queries.sql
+    -> mysql -u root -p ecommerce < your_input_file.sql > output.txt
+    -> mysql -u root -p ecommerce < queries.sql > output.txt
+    ->
+    ->
+    ->
+    ->
+    ->
+    -> mysql -u root -p ecommerce < queries.sql > output.txt
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
